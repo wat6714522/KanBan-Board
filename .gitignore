@@ -1,0 +1,13 @@
+# Dependencies
+node_modules/
+
+# Build output (do NOT commit — grading requires no build artifacts)
+dist/
+
+# Local env / editor
+.env
+.env.local
+.DS_Store
+*.log
+.vscode/
+.idea/

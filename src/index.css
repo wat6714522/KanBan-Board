@@ -1,0 +1,47 @@
+/* Global styles layered on top of Bootstrap.
+   Bootstrap itself is imported in main.jsx.
+   Board-specific styles live in pages/BoardPage.css. */
+
+:root {
+  --brand: #4f46e5;
+  --brand-soft: #eef0fe;
+  --ink: #171b24;
+  --todo: #6b7793;
+  --doing: #e0902a;
+  --done: #0fa37f;
+}
+
+body {
+  font-family: Inter, system-ui, sans-serif;
+  background: #f6f7f9;
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+}
+
+.font-display {
+  font-family: "Space Grotesk", sans-serif;
+}
+
+/* Brand button overrides Bootstrap's primary */
+.btn-brand {
+  background: var(--brand);
+  border-color: var(--brand);
+  color: #fff;
+}
+.btn-brand:hover {
+  background: #4338ca;
+  border-color: #4338ca;
+  color: #fff;
+}
+
+/* Nav active tab */
+.nav-tab {
+  color: rgba(23, 27, 36, 0.6);
+  border-radius: 8px;
+  font-weight: 500;
+}
+.nav-tab.active {
+  background: var(--brand-soft);
+  color: var(--brand) !important;
+  border-radius: 8px;
+}
