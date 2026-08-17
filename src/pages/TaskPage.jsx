@@ -13,9 +13,10 @@ import {
   loadCategories,
   saveCategories,
 } from "../lib/storage";
-import { newId } from "../lib/tasks";
-import { Card } from "react-bootstrap";
-import TaskSection from "../components/Task/TaskSection";
+
+// โหลด Component ที่อยู่ในโฟลเดอร์เดียวกัน 
+import TaskSection from "./TaskSection";
+import TaskModal from "./TaskModal";
 
 function ToDoList() {
   const [tasks, setTasks] = useState(() => loadTask(SEED_TASKS));
@@ -25,11 +26,13 @@ function ToDoList() {
 
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
-  const [createStatuts, setCreateStatus] = useState(STATUS.TODO);
+  const [createStatus, setCreateStatus] = useState(STATUS.TODO);
 
+  // บันทึกข้อมูลลง Local Storage อัตโนมัติเมื่อ tasks หรือ categories เปลี่ยนแปลง
   useEffect(() => saveTasks(tasks), [tasks]);
   useEffect(() => saveCategories(categories), [categories]);
 
+  // จัดกลุ่มงานตามสถานะ (TODO, DOING, DONE)
   const byStatus = useMemo(() => {
     const groups = { todo: [], doing: [], done: [] };
     for (const task of tasks) {
@@ -45,12 +48,6 @@ function ToDoList() {
   }
 
   function openEdit(task) {
-    setEditingTask(null);
-    setCreateStatus(status);
-    setModalOpen(true);
-  }
-
-  function openEdit(task) {
     setEditingTask(task);
     setModalOpen(true);
   }
@@ -59,7 +56,7 @@ function ToDoList() {
     setTasks((prev) => {
       const exists = prev.some((t) => t.id === saved.id);
       return exists
-        ? prev.map((t) => (t.idd === saved.id ? saved : t))
+        ? prev.map((t) => (t.id === saved.id ? saved : t)) 
         : [saved, ...prev];
     });
   }
@@ -75,7 +72,7 @@ function ToDoList() {
       prev.map((t) => {
         if (t.id !== id) return t;
         const completeDate =
-          status === STATUS.DONE ? t.completeDate || ToastBody() : null;
+          status === STATUS.DONE ? t.completeDate || new Date().toISOString() : null; 
         return { ...t, status, completeDate };
       }),
     );
@@ -96,7 +93,7 @@ function ToDoList() {
           </p>
         </div>
         <Button
-          className="btn-brand d-flex align-itmespcenter gap2"
+          className="btn-brand d-flex align-items-center gap-2"
           onClick={() => openCreate(STATUS.TODO)}
         >
           <svg
@@ -118,7 +115,7 @@ function ToDoList() {
       </div>
       <Row className="g-4">
         {COLUMNS.map((column) => (
-          <Col key={column.id} x5={12} md={4}>
+          <Col key={column.id} xs={12} md={4}> 
             <TaskSection
               column={column}
               tasks={byStatus[column.id]}
@@ -129,7 +126,19 @@ function ToDoList() {
           </Col>
         ))}
       </Row>
+
+      <TaskModal
+        show={modalOpen}
+        onHide={() => setModalOpen(false)}
+        task={editingTask}
+        defaultStatus={createStatus}
+        onSave={handleSave}
+        onDelete={handleDelete}
+        categories={categories}
+        onAddCategory={handleAddCategory}
+      />
     </Container>
   );
 }
+
 export default ToDoList;

@@ -21,9 +21,12 @@
 }
 
 .badge-category {
-  background: var(--brand-soft);
-  color: var(--brand);
-  font-weight: 500;
+  background-color: #e0e7ff !important; 
+  color: #4338ca !important;            
+  font-weight: 600;
+  padding: 5px 10px;
+  border-radius: 6px;
+  border: none;
 }
 
 /* Status columns: tinted background + coloured border */
