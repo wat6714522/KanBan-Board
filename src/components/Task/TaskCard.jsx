@@ -1,76 +1,65 @@
-import { Card, Badge, Form } from "react-bootstrap";
-import { personName } from "../../data/people";
-import { COLUMNS } from "../../data/constants";
+import { Card, Badge, Dropdown } from "react-bootstrap";
 import { formatDate, isOverdue } from "../../lib/tasks";
+import { STATUS } from "../../data/constants";
 
-function initials(name) {
-  return name
-    .split(" ")
-    .map((part) => part[0])
-    .slice(0, 2)
-    .join("")
-    .toUpperCase();
-}
+// ถอยกลับไปหน้า pages เพื่อดึงสไตล์มาใช้
+import "../../pages/TaskPage.css";
 
 function TaskCard({ task, onEdit, onStatusChange }) {
-  const overDue = isOverdue(task);
-  const who = personName(task.personId);
+  const overdue = isOverdue(task);
 
   return (
-    <Card
-      className="task-card shadow-sm border"
-      onClick={() => onEdit?.(task)}
-      role="button"
-    >
+    <Card className="task-card border-0 shadow-sm" onClick={onEdit}>
       <Card.Body className="p-3">
-        <div className="mb-2 d-flex gap-2">
-          <Badge className="badge-category pill">{task.category}</Badge>
-          {overDue && <Badge bg="danger pill">Overdue</Badge>}
+        <div className="d-flex justify-content-between align-items-start mb-2">
+          <Badge className="badge-category">{task.category}</Badge>
+          
+          <div onClick={(e) => e.stopPropagation()}>
+            <Dropdown align="end">
+              <Dropdown.Toggle variant="light" size="sm" className="border-0 p-1 bg-transparent">
+                ⚙️
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item onClick={() => onStatusChange(task.id, STATUS.TODO)}>Move to To Do</Dropdown.Item>
+                <Dropdown.Item onClick={() => onStatusChange(task.id, STATUS.DOING)}>Move to Doing</Dropdown.Item>
+                <Dropdown.Item onClick={() => onStatusChange(task.id, STATUS.DONE)}>Move to Done</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </div>
         </div>
-        <div className="fw-semibold" style={{ fontSize: 14 }}>
-          {task.tile}
-        </div>
+
+        <h6 className="fw-bold mb-1">{task.title}</h6>
         {task.description && (
-          <p className="text-secondary mb-0 mt-1" style={{ fontSize: 12 }}>
+          <p className="text-secondary mb-2" style={{ fontSize: "12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
             {task.description}
           </p>
         )}
-        <div className="d-flex align-items-center justify-content-between border-top mt-3 pt-2">
-          <div className="d-flex align-items-center gap-2">
-            <span className="avatar" title={who}>
-              {initials(who)}
-            </span>
-            <span className="text-secondary" style={{ fontSize: 12 }}>
-              {who}
-            </span>
+
+        <div className="d-flex justify-content-between align-items-end mt-3">
+          <div style={{ fontSize: "12px" }}>
+            {task.dueDate && (
+              <span className={overdue ? "text-danger fw-bold" : "text-secondary"}>
+                📅 {formatDate(task.dueDate)} {overdue && "(Late)"}
+              </span>
+            )}
           </div>
-          <span
-            className={overDue ? "text-danger" : "text-secondary"}
-            style={{ fontsize: 12 }}
-          >
-            Due {formatDate(task.dueDate)}
-          </span>
-        </div>
-        <div
-          className="d-flex align-items-center gap-2 mt-2"
-          onClick={(e) => e.stopPropagation()}
-        >
-          <small className="text-secondary">Move To</small>
-          <Form.Select
-            size="sm"
-            value={task.status}
-            onChange={(e) => onStatusChange?.(task.id, e.target.value)}
-            aria-label={`Change status of ${task.tile}`}
-          >
-            {COLUMNS.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.label}
-              </option>
-            ))}
-          </Form.Select>
+          
+          <div className="text-end">
+            {task.assigneeId && (
+              <div style={{ fontSize: "11px" }} className="text-secondary">
+                ID: {task.assigneeId}
+              </div>
+            )}
+            {task.assigneeName && (
+              <div style={{ fontSize: "12px", fontWeight: "600", color: "var(--brand)" }}>
+                {task.assigneeName}
+              </div>
+            )}
+          </div>
         </div>
       </Card.Body>
     </Card>
   );
 }
+
 export default TaskCard;

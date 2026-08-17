@@ -15,8 +15,8 @@ import {
 } from "../lib/storage";
 
 // โหลด Component ที่อยู่ในโฟลเดอร์เดียวกัน 
-import TaskSection from "./TaskSection";
-import TaskModal from "./TaskModal";
+import TaskSection from "../components/Task/TaskSection";
+import TaskModal from "../components/Task/TaskModal";
 
 function ToDoList() {
   const [tasks, setTasks] = useState(() => loadTask(SEED_TASKS));
