@@ -1,12 +1,14 @@
 import { Card, Badge, Dropdown } from "react-bootstrap";
 import { formatDate, isOverdue } from "../../lib/tasks";
 import { STATUS } from "../../data/constants";
+import { PEOPLE } from "../../data/people";
 
 // ถอยกลับไปหน้า pages เพื่อดึงสไตล์มาใช้
 import "../../pages/TaskPage.css";
 
 function TaskCard({ task, onEdit, onStatusChange }) {
   const overdue = isOverdue(task);
+  const person = PEOPLE.find((p) => p.id === task.personId) ?? "Unassigned";
 
   return (
     <Card className="task-card border-0 shadow-sm" onClick={onEdit}>
@@ -43,18 +45,18 @@ function TaskCard({ task, onEdit, onStatusChange }) {
               </span>
             )}
           </div>
-          
+    
           <div className="text-end">
-            {task.assigneeId && (
+            {person && (
+            <>
               <div style={{ fontSize: "11px" }} className="text-secondary">
-                ID: {task.assigneeId}
+                ID: {person.id}
               </div>
-            )}
-            {task.assigneeName && (
               <div style={{ fontSize: "12px", fontWeight: "600", color: "var(--brand)" }}>
-                {task.assigneeName}
+                {person.name}
               </div>
-            )}
+            </>
+          )}
           </div>
         </div>
       </Card.Body>

@@ -1,21 +1,25 @@
-import { useEffect, useState } from "react";
-import { Modal, Form, Button, Row, Col } from "react-bootstrap";
+import {useEffect, useState} from "react";
+import {Button, Col, Form, Modal, Row} from "react-bootstrap";
 
-import { STATUS } from "../../data/constants";
-import { newId } from "../../lib/tasks";
+import {STATUS} from "../../data/constants";
+import {newId} from "../../lib/tasks";
+import {PEOPLE} from "../../data/people.js";
 
-function TaskModal({ show, onHide, task, defaultStatus, onSave, onDelete, categories, onAddCategory }) {
+function TaskModal({ show, onHide, task, defaultStatus, onSave, onDelete, categories, onAddCategory, people = PEOPLE, onAddPerson }) {
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [category, setCategory] = useState("");
   const [newCategory, setNewCategory] = useState("");
   const [startDate, setStartDate] = useState("");
   const [dueDate, setDueDate] = useState("");
-  
-  const [assigneeName, setAssigneeName] = useState("");
-  const [assigneeId, setAssigneeId] = useState("");
+
+  const [personId, setAssigneeId] = useState("");
   
   const [status, setStatus] = useState(STATUS.TODO);
+
+  const [addingPerson, setAddingPerson] = useState(false);
+  const [newPersonName, setNewPersonName] = useState("");
+  const [newPersonId, setNewPersonId]= useState("");
 
   useEffect(() => {
     if (show) {
@@ -25,8 +29,7 @@ function TaskModal({ show, onHide, task, defaultStatus, onSave, onDelete, catego
         setCategory(task.category || categories[0] || "");
         setStartDate(task.startDate || "");
         setDueDate(task.dueDate || "");
-        setAssigneeName(task.assigneeName || "");
-        setAssigneeId(task.assigneeId || "");
+        setAssigneeId(task.personId|| "");
         setStatus(task.status || STATUS.TODO);
       } else {
         setTitle("");
@@ -34,7 +37,6 @@ function TaskModal({ show, onHide, task, defaultStatus, onSave, onDelete, catego
         setCategory(categories[0] || "");
         setStartDate("");
         setDueDate("");
-        setAssigneeName("");
         setAssigneeId("");
         setStatus(defaultStatus || STATUS.TODO);
       }
@@ -42,6 +44,28 @@ function TaskModal({ show, onHide, task, defaultStatus, onSave, onDelete, catego
     }
   }, [show, task, defaultStatus, categories]);
 
+  const handleAddPerson = () => {
+    const name = newPersonName.trim();
+    if (!name) return;
+
+    let id = newPersonId.trim();
+    if(!id) {
+      do {
+        id = String(Math.floor(100000 + Math.random() * 900000));
+      } while (people.some((p) => p.id === id));
+    }
+
+    if (people.some((p) => p.id === id)) {
+      alert("That ID already exists. Pick a different one.");
+      return;
+    }
+
+    onAddPerson?.({ id, name });
+    setAssigneeId(id);
+    setNewPersonName("");
+    setNewPersonId("");
+    setAddingPerson(false);
+  };
   const handleSubmit = (e) => {
     e.preventDefault();
     
@@ -70,11 +94,10 @@ function TaskModal({ show, onHide, task, defaultStatus, onSave, onDelete, catego
       startDate,
       dueDate,
       completeDate: finalCompleteDate,
-      assigneeName, 
-      assigneeId,   
+      personId,
       status,
     };
-    
+
     onSave(taskData);
     onHide();
   };
@@ -112,13 +135,51 @@ function TaskModal({ show, onHide, task, defaultStatus, onSave, onDelete, catego
           </Row>
 
           <Row className="mb-3">
-            <Form.Group as={Col} md={4}>
-              <Form.Label>Person ID</Form.Label>
-              <Form.Control type="text" value={assigneeId} onChange={(e) => setAssigneeId(e.target.value)} placeholder="e.g. 001" />
-            </Form.Group>
-            <Form.Group as={Col} md={8}>
-              <Form.Label>Full Name</Form.Label>
-              <Form.Control type="text" value={assigneeName} onChange={(e) => setAssigneeName(e.target.value)} placeholder="Responsible person's name" />
+            <Form.Group as={Col} md={12}>
+              <Form.Label >Responsible Person</Form.Label>
+              <Form.Select value={personId} onChange={(e) => setAssigneeId(e.target.value)}>
+                <option value="">Unassigned</option>
+              {people.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name} ({p.id})
+                  </option>
+              ))}
+              </Form.Select>
+
+              {onAddPerson && !addingPerson && (
+                  <Button variant="primary" className="flex-shrink-0" onClick={() => setAddingPerson(true)}> Add Person </Button>
+              )}
+
+              {onAddPerson && addingPerson && (
+                  <div className="border rounded p-3 mt-2 bg-light">
+                    <Row className="g-2">
+                      <Col md={8}>
+                        <Form.Label className="small mb-1">Name</Form.Label>
+                        <Form.Control
+                            placeholder="Full name"
+                            value={newPersonName}
+                            onChange={(e) => setNewPersonName(e.target.value)}
+                        />
+                      </Col>
+                      <Col md={4}>
+                        <Form.Label className="small mb-1">ID</Form.Label>
+                        <Form.Control
+                            placeholder="ID"
+                            value={newPersonId}
+                            onChange={(e) => setNewPersonId(e.target.value)}
+                        />
+                      </Col>
+                    </Row>
+                    <div className="d-flex justify-content-end gap-2 mt-3">
+                      <Button variant="danger" onClick={() => setAddingPerson(false)}>
+                        Cancel
+                      </Button>
+                      <Button variant="primary" onClick={handleAddPerson}>
+                        Add
+                      </Button>
+                    </div>
+                  </div>
+              )}
             </Form.Group>
           </Row>
 

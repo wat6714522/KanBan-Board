@@ -4,17 +4,14 @@ import Row from "react-bootstrap/Row";
 import Button from "react-bootstrap/Button";
 import "./TaskPage.css";
 
-import { useState, useEffect, useMemo } from "react";
-import { COLUMNS, DEFAULT_CATEGORIES, STATUS } from "../data/constants";
-import { SEED_TASKS } from "../data/seed";
-import {
-  loadTask,
-  saveTasks,
-  loadCategories,
-  saveCategories,
-} from "../lib/storage";
+import {useEffect, useMemo, useState} from "react";
+import {COLUMNS, DEFAULT_CATEGORIES, STATUS} from "../data/constants";
+import {SEED_TASKS} from "../data/seed";
+import {PEOPLE} from "../data/people";
 
-// โหลด Component ที่อยู่ในโฟลเดอร์เดียวกัน 
+import {loadCategories, loadTask, saveCategories, saveTasks,} from "../lib/storage";
+
+
 import TaskSection from "../components/Task/TaskSection";
 import TaskModal from "../components/Task/TaskModal";
 
@@ -24,15 +21,23 @@ function ToDoList() {
     loadCategories(DEFAULT_CATEGORIES),
   );
 
+  useEffect(() => saveTasks(tasks), [tasks]);
+  useEffect(() => saveCategories(categories), [categories]);
+
+  const [people, setPeople] =useState(() => {
+    const saved = localStorage.getItem("people")
+    return saved ? JSON.parse(saved) : PEOPLE;
+  })
+
+  useEffect(() => {
+    localStorage.setItem("people", JSON.stringify(people))
+  }, [people]);
+
   const [modalOpen, setModalOpen] = useState(false);
   const [editingTask, setEditingTask] = useState(null);
   const [createStatus, setCreateStatus] = useState(STATUS.TODO);
 
-  // บันทึกข้อมูลลง Local Storage อัตโนมัติเมื่อ tasks หรือ categories เปลี่ยนแปลง
-  useEffect(() => saveTasks(tasks), [tasks]);
-  useEffect(() => saveCategories(categories), [categories]);
 
-  // จัดกลุ่มงานตามสถานะ (TODO, DOING, DONE)
   const byStatus = useMemo(() => {
     const groups = { todo: [], doing: [], done: [] };
     for (const task of tasks) {
@@ -40,6 +45,10 @@ function ToDoList() {
     }
     return groups;
   }, [tasks]);
+
+  function handleAddPerson(person) {
+    setPeople((prev) => prev.some((p) => p.id === person.id) ? prev : [...prev, person]);
+  }
 
   function openCreate(status = STATUS.TODO) {
     setEditingTask(null);
@@ -136,6 +145,8 @@ function ToDoList() {
         onDelete={handleDelete}
         categories={categories}
         onAddCategory={handleAddCategory}
+        people={people}
+        onAddPerson={handleAddPerson}
       />
     </Container>
   );
