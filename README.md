@@ -2,8 +2,8 @@
 A multi page application for managing task on a three -column Kanban board, paried with a dashboard that summarizes task activity through activity cards and charts. All data is stored in the browser's Local Storage - there is no backend.
 
 # Team Members
-1. Pawat Asavapotiphan 6714522
-2. Napatra Hanwari 6711232
+1. Pawat Asavapotiphan 
+2. Napatra Hanwari  
 
 ## Project Description
 This app lets a small team organize work visually and tack progress at a glace. It is split into two pages: 
@@ -20,8 +20,8 @@ Each tasks stores a title, description, category, start date, due date, complete
 The list of responsible people is provided as seed data -- person management is intentionally out of scope. 
 
 ## Live Demo
-  + ***Github Pages:***
-  + ***Repository:***
+  + ***Github Pages: https://pipipat.github.io/KanBan-Board   ***
+  + ***Repository: https://github.com/pipipat/KanBan-Board ***
 
 ## Usage Instructions
   + ***Managing Tasks***
